@@ -1,9 +1,7 @@
 const { initializeDatabase, db } = require('./database.js');
 
 function resetIds() {
-  initializeDatabase();
-  
-  console.log('Resetting meal IDs...\n');
+  console.log('\nResetting meal IDs...');
   
   // Temporarily disable foreign keys
   db.pragma('foreign_keys = OFF');
@@ -97,4 +95,11 @@ function resetIds() {
   console.log('\n✅ Meal IDs reset to start from 1!\n');
 }
 
-resetIds();
+// Export the function
+module.exports = { resetIds };
+
+// Only run directly if this file is executed (not imported)
+if (require.main === module) {
+  initializeDatabase();
+  resetIds();
+}

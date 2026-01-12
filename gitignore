@@ -1,0 +1,39 @@
+# Database files
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test output
+coverage/
+.nyc_output/
+
+# Logs
+logs/
+*.log
+
+# Optional: Uncomment if you create these
+# test-data/
+# backups/

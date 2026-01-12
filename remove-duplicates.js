@@ -1,9 +1,7 @@
 const { initializeDatabase, db } = require('./database.js');
 
 function removeDuplicates() {
-  initializeDatabase();
-  
-  console.log('Finding duplicate meals...\n');
+  console.log('\nFinding duplicate meals...');
   
   // Find meals with the same name
   const duplicates = db.prepare(`
@@ -15,7 +13,7 @@ function removeDuplicates() {
   
   if (duplicates.length === 0) {
     console.log('No duplicates found!');
-    return;
+    return 0;
   }
   
   console.log('Found duplicates:\n');
@@ -24,13 +22,12 @@ function removeDuplicates() {
   
   for (const dup of duplicates) {
     const ids = dup.ids.split(',').map(id => parseInt(id));
-    const keepId = ids[0]; // Keep the first occurrence
-    const removeIds = ids.slice(1); // Remove the rest
+    const keepId = ids[0];
+    const removeIds = ids.slice(1);
     
     console.log(`"${dup.name}" appears ${dup.count} times (IDs: ${dup.ids})`);
     console.log(`  Keeping ID ${keepId}, removing IDs: ${removeIds.join(', ')}`);
     
-    // Delete the duplicate meals
     for (const removeId of removeIds) {
       db.prepare('DELETE FROM meals WHERE id = ?').run(removeId);
       totalRemoved++;
@@ -40,7 +37,15 @@ function removeDuplicates() {
   }
   
   console.log(`✅ Removed ${totalRemoved} duplicate meals!\n`);
-  console.log('Run "node reset-ids.js" to renumber meals starting from 1.\n');
+  return totalRemoved;
 }
 
-removeDuplicates();
+// Export the function
+module.exports = { removeDuplicates };
+
+// Only run directly if this file is executed (not imported)
+if (require.main === module) {
+  initializeDatabase();
+  removeDuplicates();
+  console.log('Run "node reset-ids.js" to renumber meals starting from 1.\n');
+}

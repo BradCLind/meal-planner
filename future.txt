@@ -1,0 +1,18 @@
+Add a way to "shop around", like searching an ingredient or one that could be substituted in the context of the recipe, throughout knowable current "sales" or upcoming ones based on the planned shopping day, but with a limit at what could be substituted, like a single ingredient in any recipe and to prompt to make the same one in multiple meals if that ingredient is being used and is on sale. 
+
+1. Pantry Inventory Tracking
+
+
+2. Preference Learning Over Time
+
+
+3. Shopping List Intelligence
+
+
+4. Meal History
+
+
+5. Quick Add from Natural Language
+
+
+6. Budget Tracking (you mentioned limited budget)

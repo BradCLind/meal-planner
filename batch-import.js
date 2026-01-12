@@ -7,6 +7,8 @@ const {
 } = require('./database.js');
 
 const fs = require('fs');
+const { removeDuplicates } = require('./remove-duplicates.js');
+const { resetIds } = require('./reset-ids.js');
 
 // Check if ingredient already exists, if not create it
 function getOrCreateIngredient(name, category, shelfLifeDays) {
@@ -156,6 +158,12 @@ function importMeals(filePath) {
   }
   
   console.log(`\n✅ Successfully imported ${imported} of ${meals.length} meals!\n`);
+  
+  // Clean up duplicates and reset IDs
+  removeDuplicates();
+  resetIds();
+  
+  console.log('🎉 Import complete!\n');
 }
 
 // Check if file path was provided
