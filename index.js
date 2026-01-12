@@ -1,7 +1,8 @@
 const {
   initializeDatabase,
   getAllMeals,
-  getMealIngredients
+  getMealIngredients,
+  addMealToHistory  // NEW: We need this to save meal selections
 } = require('./database.js');
 
 const readline = require('readline');
@@ -91,7 +92,21 @@ function generateShoppingList(selectedMealIds) {
   console.log('\n');
 }
 
-// STEP 4: Main program flow
+// STEP 4: Save meal selections to history (NEW FUNCTION)
+// This creates the "unrated" meals that we'll rate later
+function saveMealsToHistory(selectedMealIds) {
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Save each selected meal to history
+  selectedMealIds.forEach(mealId => {
+    addMealToHistory(mealId, today);
+  });
+  
+  console.log(`✅ Saved ${selectedMealIds.length} meals to history for rating later.\n`);
+}
+
+// STEP 5: Main program flow
 async function main() {
   console.log('Welcome to Meal Planner!\n');
   
@@ -116,6 +131,9 @@ async function main() {
   
   // Generate shopping list
   generateShoppingList(selectedMealIds);
+  
+  // NEW: Save selections to history for later rating
+  saveMealsToHistory(selectedMealIds);
   
   // Close the input interface
   rl.close();

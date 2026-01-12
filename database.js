@@ -53,6 +53,23 @@ function initializeDatabase() {
     )
   `);
 
+  // Meal history table (tracks each time a meal is planned/cooked)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS meal_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      meal_id INTEGER NOT NULL,
+      date_planned TEXT NOT NULL,
+      date_cooked TEXT,
+      status TEXT NOT NULL CHECK(status IN ('unrated', 'rated')) DEFAULT 'unrated',
+      brad_rating INTEGER CHECK(brad_rating BETWEEN 1 AND 5),
+      kayla_rating INTEGER CHECK(kayla_rating BETWEEN 1 AND 5),
+      skylar_rating INTEGER CHECK(skylar_rating BETWEEN 1 AND 5),
+      aubrey_rating INTEGER CHECK(aubrey_rating BETWEEN 1 AND 5),
+      comments TEXT,
+      FOREIGN KEY (meal_id) REFERENCES meals(id) ON DELETE CASCADE
+    )
+  `);
+
   console.log('Database initialized successfully!');
 }
 
@@ -104,6 +121,46 @@ function updateMealPreference(mealId, person, liked) {
   stmt.run(liked ? 1 : 0, mealId);
 }
 
+// Helper function to add a meal to history
+function addMealToHistory(mealId, datePlanned) {
+  const stmt = db.prepare('INSERT INTO meal_history (meal_id, date_planned, status) VALUES (?, ?, ?)');
+  const result = stmt.run(mealId, datePlanned, 'unrated');
+  return result.lastInsertRowid;
+}
+
+// Helper function to get all unrated meals from history
+function getUnratedMeals() {
+  const stmt = db.prepare(`
+    SELECT 
+      mh.id as history_id,
+      mh.meal_id,
+      m.name as meal_name,
+      mh.date_planned,
+      mh.date_cooked
+    FROM meal_history mh
+    JOIN meals m ON mh.meal_id = m.id
+    WHERE mh.status = 'unrated'
+    ORDER BY mh.date_planned DESC
+  `);
+  return stmt.all();
+}
+
+// Helper function to update meal rating in history
+function updateMealRating(historyId, bradRating, kaylaRating, skylarRating, aubreyRating, comments, dateCooked) {
+  const stmt = db.prepare(`
+    UPDATE meal_history 
+    SET brad_rating = ?, 
+        kayla_rating = ?, 
+        skylar_rating = ?, 
+        aubrey_rating = ?,
+        comments = ?,
+        date_cooked = ?,
+        status = 'rated'
+    WHERE id = ?
+  `);
+  stmt.run(bradRating, kaylaRating, skylarRating, aubreyRating, comments, dateCooked, historyId);
+}
+
 // Export everything
 module.exports = {
   db,
@@ -113,5 +170,8 @@ module.exports = {
   addMealIngredient,
   getAllMeals,
   getMealIngredients,
-  updateMealPreference
+  updateMealPreference,
+  addMealToHistory,
+  getUnratedMeals,
+  updateMealRating
 };
