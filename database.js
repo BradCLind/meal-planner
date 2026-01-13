@@ -161,6 +161,35 @@ function updateMealRating(historyId, bradRating, kaylaRating, skylarRating, aubr
   stmt.run(bradRating, kaylaRating, skylarRating, aubreyRating, comments, dateCooked, historyId);
 }
 
+// Helper function to get all meals with per-person average ratings
+function getMealsWithRatings() {
+  const stmt = db.prepare(`
+    SELECT 
+      m.id,
+      m.name,
+      m.instructions,
+      -- Brad's average rating and count
+      AVG(mh.brad_rating) as brad_avg_rating,
+      COUNT(mh.brad_rating) as brad_rating_count,
+      -- Kayla's average rating and count
+      AVG(mh.kayla_rating) as kayla_avg_rating,
+      COUNT(mh.kayla_rating) as kayla_rating_count,
+      -- Skylar's average rating and count
+      AVG(mh.skylar_rating) as skylar_avg_rating,
+      COUNT(mh.skylar_rating) as skylar_rating_count,
+      -- Aubrey's average rating and count
+      AVG(mh.aubrey_rating) as aubrey_avg_rating,
+      COUNT(mh.aubrey_rating) as aubrey_rating_count,
+      -- Total times this meal was in history (rated or not)
+      COUNT(mh.id) as times_cooked
+    FROM meals m
+    LEFT JOIN meal_history mh ON m.id = mh.meal_id AND mh.status = 'rated'
+    GROUP BY m.id, m.name, m.instructions
+    ORDER BY m.id
+  `);
+  return stmt.all();
+}
+
 // Export everything
 module.exports = {
   db,
@@ -173,5 +202,6 @@ module.exports = {
   updateMealPreference,
   addMealToHistory,
   getUnratedMeals,
-  updateMealRating
+  updateMealRating,
+  getMealsWithRatings
 };
